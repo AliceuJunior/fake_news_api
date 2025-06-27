@@ -3,19 +3,25 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 import joblib
+from nltk.corpus import stopwords
+import nltk
 
-# Carrega o dataset novo
-df = pd.read_csv("fake_br.csv")
+# Garante que as stopwords estão disponíveis
+nltk.download("stopwords")
+stopwords_pt = stopwords.words("portuguese")
 
-# Cria o pipeline: vetorizador + classificador
+# Carrega o dataset
+df = pd.read_csv("pre-processed.csv")
+
+# Cria pipeline com stopwords em português
 modelo = Pipeline([
-    ("vetorizador", TfidfVectorizer(stop_words="portuguese", max_features=5000)),
+    ("vetorizador", TfidfVectorizer(stop_words=stopwords_pt, max_features=5000)),
     ("classificador", MultinomialNB())
 ])
 
 # Treina o modelo
-modelo.fit(df["texto"], df["rotulo"])
+modelo.fit(df["preprocessed_news"], df["label"])
 
-# Salva o modelo treinado
+# Salva
 joblib.dump(modelo, "modelo.pkl")
-print("Modelo treinado com Fake.Br salvo com sucesso!")
+print("Modelo treinado com sucesso!")
